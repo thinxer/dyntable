@@ -1,51 +1,144 @@
-$def with (title, columns, objs)
+$def with (title, columns, objs, info=None)
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta charset='utf8' >
 <title>$title</title>
 <style type="text/css">
+    h1, form{
+        display: inline-block;
+        margin-left: 50px;
+    }
     input[type=text] {
         width: 100px;
     }
+
+    div#wrapper {
+        margin: 20px auto;
+    }
+
+    div.info {
+        clear: both;
+        margin-left: 10px;
+    }
+
+    div.content {
+        clear: both;
+    }
+
+    input[type=text].searchbox {
+        width: 200px;
+    }
+
+    .btn-delete {
+        display: none;
+    }
+
+    a, a:visited {
+        color: #2200C1;
+        margin-left: 20px;
+    }
 </style>
+<script type='text/javascript'>
+function css(theClass,element,value) {
+    //Last Updated on October 10, 1020
+    //documentation for this script at
+    //http://www.shawnolson.net/a/503/altering-css-class-attributes-with-javascript.html
+    var cssRules;
+
+    var added = false;
+    for (var S = 0; S < document.styleSheets.length; S++){
+
+        if (document.styleSheets[S]['rules']) {
+            cssRules = 'rules';
+        } else if (document.styleSheets[S]['cssRules']) {
+            cssRules = 'cssRules';
+        } else {
+            //no rules found... browser unknown
+        }
+
+        for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
+            if (document.styleSheets[S][cssRules][R].selectorText == theClass) {
+                if(document.styleSheets[S][cssRules][R].style[element]){
+                    document.styleSheets[S][cssRules][R].style[element] = value;
+                    added=true;
+                    break;
+                }
+            }
+        }
+        if(!added){
+            try{
+                document.styleSheets[S].insertRule(theClass+' { '+element+': '+value+'; }',document.styleSheets[S][cssRules].length);
+
+            } catch(err){
+                try{document.styleSheets[S].addRule(theClass,element+': '+value+';');}catch(err){}
+
+            }
+        }
+    }
+}
+</script>
 <body>
-    <h1>$title</h1>
+<div id='wrapper'>
+    <h1><a href='/'>$title</a></h1>
     <form method='GET' action='/'>
-        <input type='text' name='s' />
+        <input class='searchbox' type='text' name='s' />
         <input type='submit' value='search'/>
     </form>
+    <div class='info'>
+    $if not objs:
+        <p> Sorry, nothing found. </p>
+    $if info == 'add':
+        <p> succeeded. </p>
+    $elif info == 'update':
+        <p> succeeded. </p>
+    </div>
+    <div class='content'>
     <table>
         <thead>
             <tr>
-                <td> Action </td>
+                <td> &nbsp; </td>
+                $for c in columns:
+                    <td>$c</td>
+            </tr>
+        </thead>
+        <tbody>
+            $for obj in objs:
+                <tr class="$loop.parity">
+                    <form method='POST' action='/'>
+                        <td>
+                            <input class='btn-update' type='submit' name='__action' value='update'/>
+                            <input class='btn-delete' type='submit' name='__action' value='delete' onclick='return confirm("sure to delete?");'/>
+                            <input type='hidden' name='_id' value='$obj["_id"]'/>
+                        </td>
+                    $for c in columns:
+                        <td><input type='text' value='$obj.get(c, "")' name='$c' /></td>
+                    </form>
+                </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td> &nbsp; </td>
                 $for c in columns:
                     <td>$c</td>
             </tr>
             <tr>
                 <form method='POST' action='/'>
-                    <td><input type='submit' name='__action' value='new' /></td>
+                    <td><input type='submit' name='__action' value='add' /></td>
                     $for c in columns:
                         <td><input type='text' value='' name='$c' /></td>
                 </form>
             </tr>
-        </thead>
-        <tbody>
-        $for obj in objs:
-            <tr class="$loop.parity">
-                <form method='POST' action='/'>
-                    <td>
-                        <input type='submit' name='__action' value='save'/>
-                        <input type='submit' name='__action' value='delete' onclick='return confirm("sure to delete?");'/>
-                        <input type='hidden' name='_id' value='$obj['_id']'/>
-                    </td>
-                $for c in columns:
-                    <td><input type='text' value='$obj.get(c, "")' name='$c' /></td>
-                </form>
-            </tr>
-        </tbody>
+        </tfoot>
     </table>
+    </div>
     <br />
-    <a href='/manage'>Manage</a>
+    <br />
+    <br />
+    <br />
+    secrets: 
+    <a href='/manage'>manage this table</a>
+    <a href='javascript:css(".btn-delete", "display", "block");'>display delete buttons</a>
+</div>
 </body>
 </html>

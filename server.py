@@ -48,20 +48,20 @@ class index(object):
 
         i = web.input()
         a = i.get('__action', None)
-        if a == 'new':
+        if a == 'add':
             d = {}
             update(d, i)
             o = objs.save(d)
             o = list(objs.find(d))
-            return render.index(conf.title, conf.columns, o)
-        elif a == 'save':
+            return render.index(conf.title, conf.columns, o, 'add')
+        elif a == 'update':
             if i.get('_id', None):
                 d = objs.find_one(ObjectId(i['_id']))
                 if d:
                     update(d, i)
                     oid = objs.save(d)
                     o = [objs.find_one(oid)]
-                    return render.index(conf.title, conf.columns, o)
+                    return render.index(conf.title, conf.columns, o, 'update')
         elif a == 'delete':
             if i.get('_id', None):
                 objs.remove(ObjectId(i['_id']))
@@ -84,9 +84,15 @@ class manage(object):
 
 class export(object):
     def GET(self):
-        #yield '\xef\xbb\xbf'    # utf8 BOM
-        # TODO find a way to export CSV
+        web.header('Content-Type', 'text/csv')
+        web.header('Content-Disposition', 'attachment; filename=export.csv')
+
+        # utf8 BOM, needed for m$ excel
+        yield '\xef\xbb\xbf'    
+
+        # csv header
         yield ','.join(conf.columns) + "\n"
+        # csv data
         for o in objs.find():
             yield ','.join(map(lambda _:o.get(_, ""), conf.columns)) + "\n"
 

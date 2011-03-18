@@ -6,11 +6,13 @@ $def with (title, columns)
 <title>$title</title>
 <body>
     <h1>$title</h1>
-    <h2>Export</h2>
-    <a href='/export'>CSV</a>
-    <h2>Columns</h2>
+    <h2>export</h2>
+    <a href='/export?type=csv'>CSV</a>
+    <h2>columns</h2>
+    <p> Comma separated column names. e.g. 'Name,Address,Telephone'. </p>
     <form method='POST' action='/manage'>
-        <input type='text' name='columns' value='$",".join(columns)' />
+        <input style='width: 300px;' type='text' name='columns' value='$",".join(columns)' />
+        <br/>
         <input type='submit' value='update columns' />
     </form>
     <br/>

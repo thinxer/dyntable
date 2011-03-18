@@ -1,6 +1,6 @@
 # encoding=utf8
 
-LONGEST_WORD = 6
+LONGEST_WORD = 10
 
 def segment(text):
     ''' 
@@ -10,6 +10,7 @@ def segment(text):
     for i in range(len(text)):
         for j in range(i, min(len(text), i+LONGEST_WORD)):
             s.add(text[i:j+1])
+    s.add(text)
     return list(s)
 
 if __name__ == '__main__':

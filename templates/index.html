@@ -126,7 +126,10 @@ function css(theClass,element,value) {
                 <form method='POST' action='/'>
                     <td><input type='submit' name='__action' value='add' /></td>
                     $for c in columns:
-                        <td><input type='text' value='' name='$c' /></td>
+                        <td><input type='text' value='' name='$c' 
+                        $if loop.first:
+                            id='col-first-add'
+                        /></td>
                 </form>
             </tr>
         </tfoot>
@@ -140,5 +143,9 @@ function css(theClass,element,value) {
     <a href='/manage'>manage this table</a>
     <a href='javascript:css(".btn-delete", "display", "block");'>display delete buttons</a>
 </div>
+$if info == 'add':
+    <script type='text/javascript'>
+        document.getElementById('col-first-add').focus();
+    </script>
 </body>
 </html>

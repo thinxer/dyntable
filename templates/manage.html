@@ -1,0 +1,19 @@
+$def with (title, columns)
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset='utf8' >
+<title>$title</title>
+<body>
+    <h1>$title</h1>
+    <h2>Export</h2>
+    <a href='/export'>CSV</a>
+    <h2>Columns</h2>
+    <form method='POST' action='/manage'>
+        <input type='text' name='columns' value='$",".join(columns)' />
+        <input type='submit' value='update columns' />
+    </form>
+    <br/>
+    <a href='/'>Back to Home</a>
+</body>
+</html>

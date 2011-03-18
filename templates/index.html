@@ -1,0 +1,51 @@
+$def with (title, columns, objs)
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset='utf8' >
+<title>$title</title>
+<style type="text/css">
+    input[type=text] {
+        width: 100px;
+    }
+</style>
+<body>
+    <h1>$title</h1>
+    <form method='GET' action='/'>
+        <input type='text' name='s' />
+        <input type='submit' value='search'/>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <td> Action </td>
+                $for c in columns:
+                    <td>$c</td>
+            </tr>
+            <tr>
+                <form method='POST' action='/'>
+                    <td><input type='submit' name='__action' value='new' /></td>
+                    $for c in columns:
+                        <td><input type='text' value='' name='$c' /></td>
+                </form>
+            </tr>
+        </thead>
+        <tbody>
+        $for obj in objs:
+            <tr class="$loop.parity">
+                <form method='POST' action='/'>
+                    <td>
+                        <input type='submit' name='__action' value='save'/>
+                        <input type='submit' name='__action' value='delete' onclick='return confirm("sure to delete?");'/>
+                        <input type='hidden' name='_id' value='$obj['_id']'/>
+                    </td>
+                $for c in columns:
+                    <td><input type='text' value='$obj.get(c, "")' name='$c' /></td>
+                </form>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <a href='/manage'>Manage</a>
+</body>
+</html>

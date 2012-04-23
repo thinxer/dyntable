@@ -99,7 +99,7 @@ function css(theClass,element,value) {
             <tr>
                 <td> &nbsp; </td>
                 $for c in columns:
-                    <td>$c</td>
+                    <td>$c[0]</td>
             </tr>
         </thead>
         <tbody>
@@ -112,7 +112,18 @@ function css(theClass,element,value) {
                             <input type='hidden' name='_id' value='$obj["_id"]'/>
                         </td>
                     $for c in columns:
-                        <td><input type='text' value='$obj.get(c, "")' name='$c' /></td>
+                        <td>
+                        $if len(c) == 1:
+                            <input type='text' value='$obj[c[0]]' name='$c[0]' />
+                        $else:
+                            <select name='$c[0]'>
+                            $for o in c[1]:
+                                <option value="$o"
+                                $if obj[c[0]] == o:
+                                    selected
+                                >$o</option>
+                            </select>
+                        </td>
                     </form>
                 </tr>
         </tbody>
@@ -120,16 +131,24 @@ function css(theClass,element,value) {
             <tr>
                 <td> &nbsp; </td>
                 $for c in columns:
-                    <td>$c</td>
+                    <td>$c[0]</td>
             </tr>
             <tr>
                 <form method='POST' action='/'>
                     <td><input type='submit' name='__action' value='add' /></td>
                     $for c in columns:
-                        <td><input type='text' value='' name='$c' 
-                        $if loop.first:
-                            id='col-first-add'
-                        /></td>
+                        <td>
+                        $if len(c) == 1:
+                            <input type='text' value='' name='$c[0]'
+                            $if loop.first:
+                                id='col-first-add'
+                            />
+                        $else:
+                            <select name='$c[0]'>
+                            $for o in c[1]:
+                                <option value="$o">$o</option>
+                            </select>
+                        </td>
                 </form>
             </tr>
         </tfoot>

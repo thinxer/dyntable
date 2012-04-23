@@ -21,10 +21,22 @@ render = web.template.render('templates/')
 
 def get_tags(d):
     s = set()
-    for c in conf.columns:
+    for c in column_names():
         if d.has_key(c):
             s.update(seg.segment(d[c]))
     return list(s)
+
+def extract_column(column):
+    parts = column.split(':')
+    if len(parts) == 2:
+        parts[1] = parts[1].split('|')
+    return parts
+
+def columns():
+    return map(extract_column, conf.columns)
+
+def column_names():
+    return map(lambda _:_[0], columns())
 
 class index(object):
     def GET(self):
@@ -34,12 +46,12 @@ class index(object):
             o = list(objs.find({"_tags": {"$all": s.split()}}).limit(100))
         else:
             o = list(objs.find().limit(100))
-        return render.index(conf.title, conf.columns, o)
+        return render.index(conf.title, columns(), o)
 
     def POST(self):
 
         def update(d, i):
-            for c in conf.columns:
+            for c in column_names():
                 # input names are not decoded
                 u = c.encode('utf8')
                 if i.has_key(u):
@@ -53,7 +65,7 @@ class index(object):
             update(d, i)
             o = objs.save(d)
             o = list(objs.find(d))
-            return render.index(conf.title, conf.columns, o, 'add')
+            return render.index(conf.title, columns(), o, 'add')
         elif a == 'update':
             if i.get('_id', None):
                 d = objs.find_one(ObjectId(i['_id']))
@@ -61,7 +73,7 @@ class index(object):
                     update(d, i)
                     oid = objs.save(d)
                     o = [objs.find_one(oid)]
-                    return render.index(conf.title, conf.columns, o, 'update')
+                    return render.index(conf.title, columns(), o, 'update')
         elif a == 'delete':
             if i.get('_id', None):
                 objs.remove(ObjectId(i['_id']))
@@ -91,10 +103,10 @@ class export(object):
         yield '\xef\xbb\xbf'    
 
         # csv header
-        yield ','.join(conf.columns) + "\n"
+        yield ','.join(column_names()) + "\n"
         # csv data
         for o in objs.find():
-            yield ','.join(map(lambda _:o.get(_, ""), conf.columns)) + "\n"
+            yield ','.join(map(lambda _:o.get(_, ""), column_names())) + "\n"
 
 app = web.application(urls, globals())
 
